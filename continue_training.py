@@ -16,7 +16,7 @@ target_network = load_model(model_path)
 holding_duration = 0
 
 # Set epsilon manually
-epsilon = 0.22313984035
+epsilon = 1.0
 num_episodes = 50
 epsilon_min = 0.01
 epsilon_decay = 0.99995
