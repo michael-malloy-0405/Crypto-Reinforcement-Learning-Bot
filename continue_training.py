@@ -8,24 +8,24 @@ import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model
 
 # Load previous model
-model_path = "VALID_trading_model_2.keras"
-new_model_path = "VALID_trading_model_3.keras"
+model_path = "VALID_trading_model_15.keras"
+new_model_path = "VALID_trading_model_16.keras"
 q_network = load_model(model_path)
 target_network = load_model(model_path)
 
 holding_duration = 0
 
 # Set epsilon manually
-epsilon = 1.0
-num_episodes = 50
+epsilon = 0.7
+num_episodes = 100
 epsilon_min = 0.01
 epsilon_decay = 0.99995
 gamma = 0.99  
 batch_size = 32  
-memory = deque(maxlen=2000)  
+memory = deque(maxlen=4000)  
 state_size = 5  
 action_size = 3  
-data_file = "price_data.csv"  
+data_file = "ETH_data.csv"  
 
 class CryptoTradingEnv:
     def __init__(self, csv_file_path):
@@ -58,6 +58,7 @@ class CryptoTradingEnv:
         reward_Subtract = 0
         reward_Bonus = 0
         done = False
+        transaction_cost = 0
 
         if action == 1:
             if self.balance > 0:
@@ -65,7 +66,7 @@ class CryptoTradingEnv:
                 
 
                 self.holdings += self.balance / self.current_price
-                transaction_cost = self.holdings * 0.001
+                
                 self.balance = 0
                 self.buy_price = self.current_price
                 self.holding_duration = 0
@@ -78,13 +79,14 @@ class CryptoTradingEnv:
         elif action == 2:
             if self.holdings > 0:
                 self.balance += self.holdings * self.current_price
+                transaction_cost = self.balance * 0.01
 
                 if self.current_price > self.buy_price:
-                    reward_Bonus += (self.current_price - self.buy_price) * 0.4  # Bonus reward for selling at a profit
+                    reward_Bonus += (self.current_price - self.buy_price) * 30  # Bonus reward for selling at a profit
                     print("BONUS REWARD POSITIVE SELL")
 
                 else:
-                    reward_Bonus += (self.current_price - self.buy_price) * 0.4
+                    reward_Bonus += (self.current_price - self.buy_price) * 30
                     print("NEGATIVE REWARD NEGATIVE / NO VALUE SELL")
 
                 self.holdings = 0
